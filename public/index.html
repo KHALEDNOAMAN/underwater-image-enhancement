@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AquaClear — Underwater Image Enhancement</title>
+    <meta name="description"
+        content="Enhance underwater images using classical image processing techniques: color correction, dehazing, contrast enhancement, and more.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+
+<body>
+    <!-- Header -->
+    <header class="header">
+        <div class="header-content">
+            <div class="header-row">
+                <div class="logo">
+                    <span class="logo-icon">🌊</span>
+                    <h1>AquaClear</h1>
+                </div>
+                <button class="theme-toggle" id="themeToggle" onclick="toggleTheme()" title="Toggle Dark/Light Mode">
+                    <span class="theme-icon" id="themeIcon">🌙</span>
+                </button>
+            </div>
+            <p class="tagline">Underwater Image Enhancement & Color Correction</p>
+        </div>
+    </header>
+
+    <main class="container">
+        <!-- Upload Section -->
+        <section class="upload-section" id="uploadSection">
+            <div class="upload-area" id="uploadArea">
+                <div class="upload-icon">📸</div>
+                <h2>Drop underwater image here</h2>
+                <p>or click to browse • JPG, PNG, BMP supported</p>
+                <input type="file" id="fileInput" accept="image/*" hidden>
+                <button class="btn btn-primary" onclick="document.getElementById('fileInput').click()">
+                    Choose Image
+                </button>
+            </div>
+
+            <!-- Sample Images -->
+            <div class="samples-section" id="samplesSection">
+                <h3>🐠 Try a Sample Image</h3>
+                <div class="samples-grid" id="samplesGrid"></div>
+            </div>
+        </section>
+
+        <!-- Analysis Banner -->
+        <div class="analysis-banner" id="analysisBanner" style="display:none">
+            <div class="analysis-header">
+                <span>🔬 Auto-Analysis</span>
+                <span class="analysis-status" id="analysisStatus">Analyzing...</span>
+            </div>
+            <div class="analysis-details" id="analysisDetails"></div>
+        </div>
+
+        <!-- Settings Panel -->
+        <section class="settings-panel" id="settingsPanel" style="display:none">
+            <div class="settings-header">
+                <h2>⚙️ Enhancement Settings</h2>
+                <div class="preset-buttons">
+                    <button class="btn btn-sm btn-active" id="presetAuto" onclick="applyPreset('auto')">🔄 Auto</button>
+                    <button class="btn btn-sm" id="presetMild" onclick="applyPreset('mild')">🌤 Mild</button>
+                    <button class="btn btn-sm" id="presetStrong" onclick="applyPreset('strong')">💪 Strong</button>
+                    <button class="btn btn-sm" id="presetCustom" onclick="applyPreset('custom')">🎛 Custom</button>
+                </div>
+            </div>
+
+            <div class="settings-grid">
+                <!-- Noise Reduction -->
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <label class="toggle">
+                            <input type="checkbox" id="noiseReduction" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="setting-title">🔇 Noise Reduction</span>
+                    </div>
+                    <select id="noiseMethod" class="setting-select">
+                        <option value="bilateral">Bilateral Filter</option>
+                        <option value="nlm">Non-Local Means</option>
+                    </select>
+                </div>
+
+                <!-- Color Correction -->
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <label class="toggle">
+                            <input type="checkbox" id="colorCorrection" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="setting-title">🎨 Color Correction</span>
+                    </div>
+                    <select id="colorMethod" class="setting-select">
+                        <option value="gray_world">Gray World</option>
+                        <option value="max_rgb">Max-RGB</option>
+                        <option value="histogram_stretch">Histogram Stretch</option>
+                    </select>
+                    <label class="checkbox-label">
+                        <input type="checkbox" id="redCompensation" checked>
+                        Red channel compensation
+                    </label>
+                </div>
+
+                <!-- Dehazing -->
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <label class="toggle">
+                            <input type="checkbox" id="dehazing" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="setting-title">🌫️ Dehazing</span>
+                    </div>
+                    <label class="slider-label">
+                        Haze removal: <span id="omegaValue">0.95</span>
+                        <input type="range" id="dehazeOmega" min="0.5" max="1.0" step="0.05" value="0.95">
+                    </label>
+                </div>
+
+                <!-- Contrast Enhancement -->
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <label class="toggle">
+                            <input type="checkbox" id="contrastEnhancement" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="setting-title">🔆 Contrast</span>
+                    </div>
+                    <select id="contrastMethod" class="setting-select">
+                        <option value="clahe">CLAHE</option>
+                        <option value="histogram_eq">Histogram Eq.</option>
+                        <option value="gamma">Gamma Correction</option>
+                    </select>
+                    <label class="slider-label">
+                        CLAHE clip: <span id="claheValue">3.0</span>
+                        <input type="range" id="claheClip" min="1.0" max="8.0" step="0.5" value="3.0">
+                    </label>
+                </div>
+
+                <!-- Sharpening -->
+                <div class="setting-card">
+                    <div class="setting-header">
+                        <label class="toggle">
+                            <input type="checkbox" id="sharpening" checked>
+                            <span class="toggle-slider"></span>
+                        </label>
+                        <span class="setting-title">🔍 Sharpening</span>
+                    </div>
+                    <select id="sharpenMethod" class="setting-select">
+                        <option value="unsharp">Unsharp Mask</option>
+                        <option value="laplacian">Laplacian</option>
+                    </select>
+                    <label class="slider-label">
+                        Strength: <span id="sharpenValue">1.5</span>
+                        <input type="range" id="sharpenStrength" min="0.5" max="3.0" step="0.1" value="1.5">
+                    </label>
+                </div>
+            </div>
+
+            <button class="btn btn-primary btn-large" id="enhanceBtn" onclick="enhanceImage()">
+                🌊 Enhance Image
+            </button>
+        </section>
+
+        <!-- Results Section -->
+        <section class="results-section" id="resultsSection" style="display:none">
+            <div class="comparison-section">
+                <h2>Before & After</h2>
+                <div class="comparison-container">
+                    <div class="comparison-img">
+                        <img id="originalImage" alt="Original">
+                        <span class="label">Original</span>
+                    </div>
+                    <div class="comparison-img">
+                        <img id="enhancedImage" alt="Enhanced">
+                        <span class="label label-enhanced">Enhanced</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="metrics-section">
+                <h2>📊 Quality Metrics</h2>
+                <div class="metrics-grid" id="metricsGrid"></div>
+            </div>
+
+            <div class="steps-section">
+                <h2>🔬 Processing Steps</h2>
+                <p class="steps-subtitle">Each step applied in order</p>
+                <div class="steps-grid" id="stepsGrid"></div>
+            </div>
+
+            <div class="actions-row">
+                <button class="btn btn-primary" onclick="downloadEnhanced()">💾 Download Enhanced</button>
+                <button class="btn btn-secondary" onclick="resetAll()">🔄 Try Another Image</button>
+            </div>
+        </section>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay" style="display:none">
+            <div class="loading-content">
+                <div class="loading-spinner"></div>
+                <h3 id="loadingTitle">Enhancing your image...</h3>
+                <p id="loadingSubtitle">Applying image processing techniques</p>
+            </div>
+        </div>
+    </main>
+
+    <footer class="footer">
+        <p>AquaClear - Underwater Image Enhancement & Color Correction</p>
+        <p>Khaled Noaman - Image Processing Course - Istanbul Arel University - 2026</p>
+    </footer>
+
+    <script src="js/app.js"></script>
+</body>
+
+</html>
